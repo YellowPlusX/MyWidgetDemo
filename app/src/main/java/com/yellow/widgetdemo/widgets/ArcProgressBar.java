@@ -13,6 +13,7 @@ import android.view.animation.Transformation;
 
 /**
  * Created by hjx on 16-1-11.
+ * 一个弧形进度条，暂时只可以可以设置进度、进度条颜色和进度条宽度
  */
 public class ArcProgressBar extends View {
 
@@ -81,6 +82,10 @@ public class ArcProgressBar extends View {
 
     }
 
+    /**
+     * 设置画笔的宽度，即设置进度条宽度
+     * @param stroke
+     */
     public void setBaseArcPaintStroke(int stroke) {
         ARC_PAINT_STROKE = stroke;
     }
