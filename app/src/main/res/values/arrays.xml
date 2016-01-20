@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 每新增一个view，都应该在这里添加view的名称、描述和这个view所在Activity对应的action -->
+
+    <string-array name="widgetTitle">
+        <item>ArcProgressBar</item>
+    </string-array>
+
+
+    <string-array name="widgetSummary">
+        <item>弧形进度条</item>
+    </string-array>
+
+    <string-array name="action">
+        <item>com.yellow.widgetdemo.action.ArcProgressBarActivity</item>
+    </string-array>
+
+</resources>
