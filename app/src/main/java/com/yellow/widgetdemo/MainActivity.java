@@ -70,9 +70,9 @@ public class MainActivity extends Activity {
 
     private Map getActionMap() {
         Map<Integer, String> actionMap = new HashMap<Integer, String>();
-        String aciton[] = getResources().getStringArray(R.array.action);
-        for (int i = 0, count = aciton.length; i < count; i++) {
-            actionMap.put(i, aciton[i]);
+        String action[] = getResources().getStringArray(R.array.action);
+        for (int i = 0, count = action.length; i < count; i++) {
+            actionMap.put(i, action[i]);
         }
         return actionMap;
     }

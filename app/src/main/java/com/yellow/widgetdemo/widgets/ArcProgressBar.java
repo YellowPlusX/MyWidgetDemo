@@ -26,6 +26,10 @@ public class ArcProgressBar extends View {
     private static final int PROGRESS_ARC_COLOR_GOOD = Color.rgb(200, 300, 300);
     private static final int PROGRESS_ARC_COLOR_AWESOME = Color.rgb(4, 4, 4);
 
+    private static final int START_ANGLE = 130;// 暂定开启角度为130度
+    //由于圆弧绘制默认从水平0度顺时针绘制，这里为保持两边对称
+    private static final int SWEEP_ANGLE = 360 - (START_ANGLE - 90) * 2;
+
     private static int ARC_PAINT_STROKE = 25;
 
     private float mProgress = .0001f;
@@ -72,12 +76,12 @@ public class ArcProgressBar extends View {
         paint.setStyle(Paint.Style.STROKE);
         paint.setAntiAlias(true);
         canvas.drawArc(new RectF(ARC_PAINT_STROKE, ARC_PAINT_STROKE,
-                getWidth() - ARC_PAINT_STROKE, getHeight() - ARC_PAINT_STROKE), 130, 280, false, paint);
+                getWidth() - ARC_PAINT_STROKE, getHeight() - ARC_PAINT_STROKE), START_ANGLE, SWEEP_ANGLE, false, paint);
         // canvas.restore();
         paint.setColor(PROGRESS_ARC_COLOR_GOOD);
         if (mProgressSweepAngle > 0.01) {
             canvas.drawArc(new RectF(ARC_PAINT_STROKE, ARC_PAINT_STROKE,
-                    getWidth() - ARC_PAINT_STROKE, getHeight() - ARC_PAINT_STROKE), 130, mProgressSweepAngle, false, paint);
+                    getWidth() - ARC_PAINT_STROKE, getHeight() - ARC_PAINT_STROKE), START_ANGLE, mProgressSweepAngle, false, paint);
         }
 
     }
@@ -112,7 +116,7 @@ public class ArcProgressBar extends View {
             super.applyTransformation(interpolatedTime, t);
             Log.i("hjx", "interpolatedTime = " + interpolatedTime);
             if (interpolatedTime < 1.0f) {
-                mProgressSweepAngle = 280 * mProgress * interpolatedTime;
+                mProgressSweepAngle = SWEEP_ANGLE * mProgress * interpolatedTime;
                 Log.i("hjx", "mProgressSweepAngle = " + mProgressSweepAngle);
                 invalidate();
             }
