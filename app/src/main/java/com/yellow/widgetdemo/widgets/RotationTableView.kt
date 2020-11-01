@@ -46,7 +46,7 @@ class RotationTableView @JvmOverloads constructor(
         private const val CIRCLE_DEGREE = 360f
         private const val ONE_THIRD_CIRCLE_DEGREE = 270f // 1/3 circle degree
         private const val ONE_EIGHT_CIRCLE_DEGREE: Double = 45.0 // 1/8 circle degree
-        private const val AWARD_ICON_ROTATION = 135f // 90 + 45
+        private const val PANEL_ICON_ROTATION = 135f // 90 + 45
 
         private const val HALF_CIRCLE = 180f
     }
@@ -79,8 +79,11 @@ class RotationTableView @JvmOverloads constructor(
     private val iconPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-    private var specialPanelColor: RadialGradient? = null
-    private var tablePanelColor: Array<RadialGradient>? = null
+    private var specialPanelGradientColor: RadialGradient? = null
+    private var tablePanelGradientColors: Array<RadialGradient>? = null
+
+    private var specialPanelColor: Int = -1
+    private var tablePanelColors: Array<Int>? = null
 
     private var selectedPosition: Int = -1
 
@@ -107,11 +110,11 @@ class RotationTableView @JvmOverloads constructor(
         }
     }
 
-    fun <T> setTablePanelList(awardList: List<T>, panelDataAdapter: TablePanelAdapter<T>) {
+    fun <T> setTablePanelList(panelContentList: List<T>, panelDataAdapter: TablePanelAdapter<T>) {
         tablePanelList.clear()
 
         // convert data
-        awardList.forEachIndexed { index, data ->
+        panelContentList.forEachIndexed { index, data ->
             val tablePanelEntity = TablePanelEntity()
             tablePanelEntity.text = panelDataAdapter.getText(data, index)
             tablePanelEntity.iconId = panelDataAdapter.getIconId(data, index)
@@ -129,13 +132,6 @@ class RotationTableView @JvmOverloads constructor(
         size = min(viewWidth, viewHeight)
         radius = size / 2f
         onPanelColorCreator?.invoke(radius)
-    }
-
-    fun initPayTableColor(
-        specialPanelColor: RadialGradient?, tablePanelColor: Array<RadialGradient>?
-    ) {
-        this.specialPanelColor = specialPanelColor
-        this.tablePanelColor = tablePanelColor
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -162,11 +158,19 @@ class RotationTableView @JvmOverloads constructor(
         val drawRect = RectF(-radius, -radius, radius, radius)
         var startAngle = 0f
         for (i in 1..tablePanelCount) {
-            if (i == tablePanelCount && specialPanelColor != null) {
-                tablePaint.shader = specialPanelColor
-            } else {
-                tablePanelColor?.apply {
+            if (i == tablePanelCount && specialPanelGradientColor != null) {
+                tablePaint.shader = specialPanelGradientColor
+            } else if (tablePanelGradientColors != null) {
+                tablePanelGradientColors?.apply {
                     tablePaint.shader = get(i % size)
+                }
+            } else if (i == tablePanelCount && specialPanelColor != -1) {
+                tablePaint.shader = null
+                tablePaint.color = specialPanelColor
+            } else if (tablePanelColors != null) {
+                tablePanelColors?.apply {
+                    tablePaint.shader = null
+                    tablePaint.color = get(i % size)
                 }
             }
             canvas.drawArc(drawRect, startAngle, sweepAngle, true, tablePaint)
@@ -175,7 +179,7 @@ class RotationTableView @JvmOverloads constructor(
         canvas.save()
         canvas.rotate(-sweepAngle / 2 - ONE_EIGHT_CIRCLE_DEGREE.toFloat(), 0f, 0f)
 
-        // draw award icon and text
+        // draw panel icon and text
         val anchorCenter = (radius * sin(ONE_EIGHT_CIRCLE_DEGREE) / 2).toFloat()
         for (i in 0 until tablePanelCount) {
             canvas.save()
@@ -189,7 +193,7 @@ class RotationTableView @JvmOverloads constructor(
             val prizeDrawableId = panelEntity.iconId
             // read only bitmap
             val baseBitmap = BitmapFactory.decodeResource(resources, prizeDrawableId)
-            val awardRectF = RectF(
+            val panelRectF = RectF(
                 arcPanelCenter - baseBitmap.width.toFloat() / 2,
                 arcPanelCenter - baseBitmap.height.toFloat() / 2,
                 arcPanelCenter + baseBitmap.width.toFloat() / 2,
@@ -197,17 +201,17 @@ class RotationTableView @JvmOverloads constructor(
             )
             val matrix = Matrix()
             matrix.setRotate(
-                AWARD_ICON_ROTATION,
+                PANEL_ICON_ROTATION,
                 baseBitmap.width.toFloat() / 2,
                 baseBitmap.height.toFloat() / 2
             )
             // target mutable bitmap to rotate
-            val awardBitmap = Bitmap.createBitmap(
+            val panelBitmap = Bitmap.createBitmap(
                 baseBitmap, 0, 0, baseBitmap.width, baseBitmap.height, matrix, true
             )
-            canvas.drawBitmap(awardBitmap, null, awardRectF, iconPaint)
+            canvas.drawBitmap(panelBitmap, null, panelRectF, iconPaint)
             baseBitmap.recycle()
-            awardBitmap.recycle()
+            panelBitmap.recycle()
             drawText(canvas, panelEntity.text)
             canvas.restore()
         }
@@ -251,7 +255,7 @@ class RotationTableView @JvmOverloads constructor(
                     LogUtil.i(TAG, "startRotate onAnimationEnd = $rotation")
                     // Avoid the rotation too large to stack over flow.
                     rotation = (rotation + CIRCLE_DEGREE) % 360
-                    goTargetAward()
+                    goTargetPanel()
                 }
             })
             addUpdateListener {
@@ -274,8 +278,8 @@ class RotationTableView @JvmOverloads constructor(
         stopAutoRotate()
     }
 
-    private fun goTargetAward() {
-        // start the award animation to specified position
+    private fun goTargetPanel() {
+        // start the panel animation to specified position
         val degreeOffset = if (offsetDegree == -1f) { // restore
             CIRCLE_DEGREE
         } else {
@@ -449,4 +453,35 @@ class RotationTableView @JvmOverloads constructor(
         // Yes,it is correct!The dy is used in dx owing to the text painting direction is vertical
         textPaint.setShadowLayer(1f, -dy, 0f, Color.parseColor("#7F000000"))
     }
+
+    fun setTablePanelColor(
+        specialPanelColor: RadialGradient?, tablePanelColor: Array<RadialGradient>?
+    ) {
+        this.specialPanelGradientColor = specialPanelColor
+        this.tablePanelGradientColors = tablePanelColor
+    }
+
+    fun setTablePanelColor(
+        specialPanelColor: Int, tablePanelColors: Array<Int>
+    ) {
+        this.specialPanelColor = specialPanelColor
+        this.tablePanelColors = tablePanelColors
+    }
+
+    fun setTablePanelColor(specialPanelGradientColor: RadialGradient?) {
+        this.specialPanelGradientColor = specialPanelGradientColor
+    }
+
+    fun setTablePanelColor(tablePanelGradientColors: Array<RadialGradient>?) {
+        this.tablePanelGradientColors = tablePanelGradientColors
+    }
+
+    fun setTablePanelColor(specialPanelColor: Int) {
+        this.specialPanelColor = specialPanelColor
+    }
+
+    fun setTablePanelColor(tablePanelColors: Array<Int>) {
+        this.tablePanelColors = tablePanelColors
+    }
+
 }
