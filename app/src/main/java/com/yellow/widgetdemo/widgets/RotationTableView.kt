@@ -364,7 +364,7 @@ class RotationTableView @JvmOverloads constructor(
                         onPanelClick(event)
                         return true
                     }
-                    return false
+                    return super.onTouchEvent(event)
                 }
             }
             return super.onTouchEvent(event)

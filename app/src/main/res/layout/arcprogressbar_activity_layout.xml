@@ -16,4 +16,13 @@
         android:layout_height="50dp"
         android:layout_marginTop="30dp" />
 
+    <Switch
+        android:id="@+id/anim_switch"
+        android:text="动画开关"
+        android:checked="true"
+        android:textColor="@android:color/black"
+        android:layout_marginTop="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"/>
+
 </LinearLayout>

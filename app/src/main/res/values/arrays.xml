@@ -4,15 +4,18 @@
 
     <string-array name="widgetTitle">
         <item>ArcProgressBar</item>
+        <item>RotationTableView</item>
     </string-array>
 
 
     <string-array name="widgetSummary">
         <item>弧形进度条</item>
+        <item>自定义圆形转盘</item>
     </string-array>
 
     <string-array name="action">
         <item>com.yellow.widgetdemo.action.ArcProgressBarActivity</item>
+        <item>com.yellow.widgetdemo.action.RotationTableActivity</item>
     </string-array>
 
 </resources>
