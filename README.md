@@ -5,4 +5,4 @@
 ![emaple](./wikisrc/video2gif_20201101_234722.gif)
 
 ### 转盘
-![emaple](./wikisrc/video2gif_20201101_234642.gif)
+![emaple](./wikisrc/video2gif_20201101_235454.gif)
